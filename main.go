@@ -104,7 +104,7 @@ func handleMessage(message *tg.Message) {
 	if message.Text == "/start" {
 		msg := tg.MessageRequest{
 			ChatID:                message.Chat.ID,
-			Text:                  "Ciao! 🤓\n\nSono *LocusPocus* e ti posso aiutare a trovare le aule libere presso il Polo Ferrari dell'Università di Trento 🎓\n\nScrivimi /povo (o qualsiasi altra cosa) per ottenere la lista delle aule libere.\n\nAltre info in /aiuto",
+			Text:                  "Ciao! 🤓\n\nSono una copia di __LocusPocus__\n\n Scrivimi /aule per ottenere la lista delle aule libere.\n\nAltre info in /aiuto",
 			ParseMode:             "Markdown",
 			DisableWebPagePreview: true,
 		}
@@ -117,7 +117,7 @@ func handleMessage(message *tg.Message) {
 	} else if message.Text == "/aiuto" {
 		msg := tg.MessageRequest{
 			ChatID:    message.Chat.ID,
-			Text:      "*LocusPocus* è il bot per controllare la disponibilità delle aule presso il Polo Ferrari dell'Università di Trento 🎓\n\nScrivi /povo per ottenere la lista delle aule libere.\n\nSviluppato da Matteo Contrini (@matteocontrini). Si ringraziano Alessandro Conti per il nome del bot e Dario Crisafulli per il logo.\n\n[Codice sorgente](https://github.com/matteocontrini/locuspocusbot)",
+			Text:      "Scrivi /aule per ottenere la lista delle aule libere e /mappa per ottenere una mappa di Povo 1.\n\nSviluppato da Matteo Contrini (@matteocontrini). Si ringraziano Alessandro Conti per il nome del bot e Dario Crisafulli per il logo.\n\n[Codice sorgente](https://github.com/matteocontrini/locuspocusbot)",
 			ParseMode: "Markdown",
 		}
 
@@ -125,6 +125,30 @@ func handleMessage(message *tg.Message) {
 
 		if err != nil {
 			log.Println(err)
+		}
+	} else if message.Text == "/mappa" {
+		msg := tg.MessageRequest{
+			ChatID:    message.Chat.ID,
+			Text:      "[Piano terra](https://i.postimg.cc/5bn3vDP8/IMG-20180918-WA0008.jpg)",
+			ParseMode: "Markdown",
+		}
+
+		err := bot.Send(&msg)
+
+		if err != nil {
+			log.Println(err)
+		}
+
+		msg2 := tg.MessageRequest{
+			ChatID:    message.Chat.ID,
+			Text:      "[Primo piano](https://i.postimg.cc/9Qxm1CnR/IMG-20180918-WA0007.jpg)",
+			ParseMode: "Markdown",
+		}
+
+		err2 := bot.Send(&msg2)
+
+		if err2 != nil {
+			log.Println(err2)
 		}
 	} else {
 		sendRooms(message.Chat.ID)
@@ -182,7 +206,7 @@ func editRoomsMessage(chatID int64, mid int, group string) {
 		}
 
 		btn1 = tg.InlineKeyboardButton{
-			Text:         "✅ Libere",
+			Text:         "Libere",
 			CallbackData: "free;povo;now",
 		}
 
@@ -212,7 +236,7 @@ func editRoomsMessage(chatID int64, mid int, group string) {
 		}
 
 		btn2 = tg.InlineKeyboardButton{
-			Text:         "✅ Occupate",
+			Text:         "Occupate",
 			CallbackData: "free;povo;future",
 		}
 
@@ -242,7 +266,7 @@ func editRoomsMessage(chatID int64, mid int, group string) {
 		}
 
 		btn3 = tg.InlineKeyboardButton{
-			Text:         "✅ Tutte le aule",
+			Text:         " Tutte le aule",
 			CallbackData: "free;povo;all",
 		}
 	}
@@ -297,7 +321,7 @@ func getFreeRoms(t time.Time, group string) GroupedRooms {
 	for _, room := range rooms {
 		if room.IsFreeLimitedAt(t) {
 			if room.FreeUntil.IsZero() {
-				text := "Libera tutto il giorno"
+				text := "Libera fino a fine giornata"
 				grouped.AddFreeNow(room, text)
 			} else {
 				text := fmt.Sprintf("Libera fino alle %s", formatHour(room.FreeUntil))
@@ -306,7 +330,7 @@ func getFreeRoms(t time.Time, group string) GroupedRooms {
 		} else {
 			if room.FreeSince.IsZero() {
 				if room.FreeUntil.IsZero() {
-					text := "Libera tutto il giorno"
+					text := "Libera fino a fine giornata"
 					grouped.AddFreeNow(room, text)
 				} else {
 					text := fmt.Sprintf("Libera fino alle %s", formatHour(room.FreeUntil))
